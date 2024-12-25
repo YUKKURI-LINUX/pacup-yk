@@ -1,15 +1,57 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 function usage() {
   cat <<EOM
 
-使用方法: $(basename $0) [オプション1] [オプション2]...
+Usage: $(basename $0) [-ayh]...
 
-    -a          APTのみ実行
-    -y		'y'の入力をスキップします
-    -h          ヘルプを表示します
+    -a    Run apt only.
+    -y		Skip confirmations from apt.
+    -h    Show this help.
 
 EOM
+}
+
+function check_root() {
+  sudo echo -n
+  if [ $? != 0 ]; then
+    echo "pacup: root privilege is needed."
+    sudo echo -n
+    if [ $? != 0 ]; then
+      echo -e "pacup: ERR: Failed to get root privilege. Abort."
+      exit 1
+    fi
+  fi
+}
+
+function PACUP_APT() {
+  echo "pacup: (apt) Updating package list..."
+  sudo apt-get update
+  echo "pacup: (apt) Upgrading all packages... FLAGS: '$PACUP_YES'"
+  sudo apt-get full-upgrade$PACUP_YES
+  echo "pacup: (apt) Removing needless packages or broken packages... FLAGS: '$PACUP_YES'"
+  sudo apt-get autoremove$PACUP_YES --fix-broken
+}
+
+function PACUP_SNAP() {
+  if [ $(command -v snap) ]; then
+    echo "pacup: (snap) Refreshing snap packages..."
+    sudo snap refresh
+  else
+    echo "pacup: (snap) No installation of snap was found. Skipping."
+  fi
+}
+
+function PACUP_FLTPK() {
+  if [ $(command -v flatpak) ]; then
+    echo "pacup: (flatpak) Updating packages... FLAGS: '$PACUP_YES'"
+    flatpak --user update$PACUP_YES
+
+    echo "pacup: (flatpak) Updating packages(system-wide installed)... FLAGS: '$PACUP_YES'"
+    sudo flatpak update$PACUP_YES
+  else
+   echo "pacup: (flatpak) No installation of flatpak was found. Skipping."
+  fi
 }
 
 while (($#>0)); do
@@ -32,55 +74,15 @@ while (($#>0)); do
   shift
 done
 
-function PACUP_APT() {
-  echo -e "\nsudo apt-get update を実行します"
-  sudo apt-get update
-  echo -e "\nsudo apt-get full-upgrade$PACUP_YES を実行します"
-  sudo apt-get full-upgrade$PACUP_YES
-  echo -e "\nsudo apt-get autoremove$PACUP_YES --fix-broken を実行します"
-  sudo apt-get autoremove$PACUP_YES --fix-broken
-}
-
-function PACUP_SYS() {
-  if [ $(command -v snap) ]; then
-    echo -e "\nsudo snap refresh を実行します"
-    sudo snap refresh
-  fi
-  if [ $(command -v flatpak) ]; then
-    echo -e "\nsudo flatpak update$PACUP_YES を実行します"
-    sudo flatpak update$PACUP_YES
-  fi
-}
-
 if [ "$PACUP_MOD" == "apt" ]; then
-  sudo echo -n
-  if [ $? != 0 ]; then
-    echo -e "\nAPTコマンドの実行はRoot(管理者)権限を要求します｡\nもう一度お試しください｡\n"
-    sudo echo -n
-    if [ $? != 0 ]; then
-      echo -e "\n権限の昇格に失敗したため､ 実行を終了しました｡"
-      exit 1
-    fi
-  fi
+  check_root
   PACUP_APT
-  exit 0
+else
+  check_root
+  PACUP_APT
+  PACUP_SNAP
+  PACUP_FLTPK
 fi
 
-sudo echo -n
-if [ $? != 0 ]; then
-  echo -e "\nRoot(管理者)権限を要求しています｡\nもう一度お試しください｡\n"
-  sudo echo -n
-  if [ $? != 0 ]; then
-    echo -e "\n権限の昇格に失敗したため､ 実行を終了しました｡"
-    exit 1
-  fi
-fi
-
-PACUP_APT
-if [ $(command -v flatpak) ]; then
-  echo -e "\nflatpak update$PACUP_YES を実行します"
-  flatpak update$PACUP_YES
-fi
-PACUP_SYS
-echo -e "\n完了しました！"
+echo "pacup: Done."
 exit 0

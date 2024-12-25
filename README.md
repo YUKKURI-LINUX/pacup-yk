@@ -1,18 +1,41 @@
 # pacup
-***Simplify package updates***
+pacup is an automation script to update packages, for Debian/Ubuntu.
 
-## :fountain_pen:Contributors
-**PenN**:  
-<a href="https://github.com/PengiNN"><img src="https://avatars.githubusercontent.com/u/103301288?v=4" alt="PenN Profile Image" title="PenN" width=150></a>
+## Package Manager Supports
+- apt
+- Snap
+- Flatpak
+
+## Installation
+Install:
+
+```make install```
+
+Uninstall:
+
+```make remove```
+
+## Usage
+```pacup [-a, -y, -h]```
+
+*Options:*
+- a: Run apt only.
+- y: Skip confirmations from apt.
+- h: Show help.
+
+## Contributors 
+### Original
+<a href="https://github.com/PengiNN">**PenN**</a>
 - Made a template for [**pacup**](https://github.com/PengiNN/pacup "PengiNN/pacup")
 
-**桜咲ヒロ**:  
-<a href="https://github.com/Sakurasaki-Hiro"><img src="https://avatars.githubusercontent.com/u/114509862?v=4" alt="桜咲ヒロ Profile Image" title="桜咲ヒロ" width=150></a>
+<a href="https://github.com/Sakurasaki-Hiro">**桜咲ヒロ(Hiro Sakurasaki)**</a>
 - [**Snap**](https://snapcraft.io/ "Snapcraft") and [**Flatpak**](https://flatpak.org/ "Flatpak") added to update platform
 
-**Syuugo**:  
-<a href="https://github.com/s1204IT"><img src="https://avatars.githubusercontent.com/u/52069677?v=4" alt="Syuugo Profile Image" title="Syuugo" width=150></a>
+<a href="https://github.com/s1204IT">**Syuugo**</a>
 - Mainly, adding and modifying features
 
-## :warning:Attention
-This script has been edited for embedding in **open.Yellow.os**
+### Forked
+**Sylphid_Modder**
+- Integration for embedding to YUKKURI Linux series.
+
+
